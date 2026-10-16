@@ -23,7 +23,8 @@ namespace DiGi.GLTF.Analytical
         // registry (see Modify.Register).
 
         /// <summary>
-        /// Converts all components of the specified <see cref="BuildingModel"/> (walls, roofs, floors and other components with surface geometry) into <see cref="GLTFNode"/> instances.
+        /// Converts all components of the specified <see cref="BuildingModel"/> (walls, roofs, floors and other components with surface geometry), and in <see cref="BuildingModelDetailLevel.Component"/> detail the windows and doors hosted on them, into <see cref="GLTFNode"/> instances.
+        /// <para>In <see cref="BuildingModelDetailLevel.Component"/> detail, an opening hosted on a component is exported after the component's nodes: windows with opacity 0.5, doors with opacity 1; an opening without a construction or without a placed surface is skipped.</para>
         /// </summary>
         /// <param name="buildingModel">The <see cref="BuildingModel"/> to be converted. This value can be null.</param>
         /// <param name="reference">The optional root <see cref="IReference"/> of the building model (for example a county + building <see cref="ComplexReference"/>). Node references extend it (component step appended per node) and node names are derived from its last step (see <see cref="Query.Name(IReference?)"/>).</param>
@@ -163,6 +164,28 @@ namespace DiGi.GLTF.Analytical
                 {
                     result.AddRange(gLTFNodes);
                 }
+
+                List<IOpening>? openings = buildingModel?.GetOpenings<IOpening>(component);
+                if (openings is not null)
+                {
+                    foreach (IOpening opening in openings)
+                    {
+                        GLTFNode? gLTFNode_Opening = null;
+                        try
+                        {
+                            gLTFNode_Opening = ToGLTF_GLTFNode(buildingModel, opening, reference_Component, tolerance);
+                        }
+                        catch (System.Exception)
+                        {
+                            gLTFNode_Opening = null;
+                        }
+
+                        if (gLTFNode_Opening is not null)
+                        {
+                            result.Add(gLTFNode_Opening);
+                        }
+                    }
+                }
             }
 
             return result;
@@ -183,8 +206,6 @@ namespace DiGi.GLTF.Analytical
                 return null;
             }
 
-            double opacity = component is IWindow ? 0.5 : 1;
-
             string? properties = (component as ISerializableObject)?.ToSystem_String();
 
             IReference? reference_Component = reference ?? Core.Create.UniqueReference(component);
@@ -197,13 +218,61 @@ namespace DiGi.GLTF.Analytical
                 name = component.GetType().Name;
             }
 
-            GLTFNode? gLTFNode = Create.GLTFNode(surface3D, name, reference_Temp, Query.Color(component), opacity, properties, tolerance);
+            GLTFNode? gLTFNode = Create.GLTFNode(surface3D, name, reference_Temp, Query.Color(component), 1, properties, tolerance);
             if (gLTFNode is null)
             {
                 return null;
             }
 
             return [gLTFNode];
+        }
+
+        /// <summary>
+        /// Converts the specified opening (window or door) hosted on the <paramref name="buildingModel"/> into a <see cref="GLTFNode"/> using its placed surface (see <c>DiGi.Analytical.Building.Query.Surface3D(IOpening, IOpeningConstruction)</c>): windows are exported with opacity 0.5, doors with opacity 1.
+        /// </summary>
+        /// <param name="buildingModel">The <see cref="BuildingModel"/> hosting the opening, used to resolve its construction. This value can be null.</param>
+        /// <param name="opening">The opening to be converted. This value can be null.</param>
+        /// <param name="reference">The optional <see cref="IReference"/> (typically the hosting component's) to extend with the opening's unique reference; its last step becomes the node name (see <see cref="Query.Name(IReference?)"/>).</param>
+        /// <param name="tolerance">The distance tolerance used during triangulation.</param>
+        /// <returns>A single <see cref="GLTFNode"/> representing the opening, or null when the opening has no construction or no placed surface.</returns>
+        private static GLTFNode? ToGLTF_GLTFNode(BuildingModel? buildingModel, IOpening? opening, IReference? reference, double tolerance)
+        {
+            if (buildingModel is null || opening is null)
+            {
+                return null;
+            }
+
+            IOpeningConstruction? openingConstruction = buildingModel.GetOpeningConstruction<IOpeningConstruction>(opening);
+            if (openingConstruction is null)
+            {
+                return null;
+            }
+
+            ISurface3D? surface3D_Opening = opening.Surface3D(openingConstruction);
+            if (surface3D_Opening is null)
+            {
+                return null;
+            }
+
+            double opacity = opening is IWindow ? 0.5 : 1;
+
+            string? properties = opening.ToSystem_String();
+
+            IReference? reference_Opening = Core.Create.UniqueReference(opening);
+            if (reference is not null)
+            {
+                reference_Opening = Core.Create.Reference(reference, reference_Opening);
+            }
+
+            string? reference_Temp = reference_Opening?.ToString();
+
+            string? name = Query.Name(reference_Opening);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = opening.GetType().Name;
+            }
+
+            return Create.GLTFNode(surface3D_Opening, name, reference_Temp, Query.Color(opening), opacity, properties, tolerance);
         }
     }
 }

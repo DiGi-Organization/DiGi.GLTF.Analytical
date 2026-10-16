@@ -14,11 +14,52 @@ public static class Convert
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → Convert
 ### Methods
 
+<a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double)'></a>
+
+## Convert\.ToGLTF\_GLTFNode\(BuildingModel, IOpening, IReference, double\) Method
+
+Converts the specified opening \(window or door\) hosted on the [buildingModel](DiGi.GLTF.Analytical.md#DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double).buildingModel 'DiGi\.GLTF\.Analytical\.Convert\.ToGLTF\_GLTFNode\(DiGi\.Analytical\.Building\.Classes\.BuildingModel, DiGi\.Analytical\.Building\.Interfaces\.IOpening, DiGi\.Core\.Interfaces\.IReference, double\)\.buildingModel') into a [DiGi\.GLTF\.Classes\.GLTFNode](https://learn.microsoft.com/en-us/dotnet/api/digi.gltf.classes.gltfnode 'DiGi\.GLTF\.Classes\.GLTFNode') using its placed surface \(see `DiGi.Analytical.Building.Query.Surface3D(IOpening, IOpeningConstruction)`\): windows are exported with opacity 0\.5, doors with opacity 1\.
+
+```csharp
+private static DiGi.GLTF.Classes.GLTFNode? ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel? buildingModel, DiGi.Analytical.Building.Interfaces.IOpening? opening, DiGi.Core.Interfaces.IReference? reference, double tolerance);
+```
+#### Parameters
+
+<a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double).buildingModel'></a>
+
+`buildingModel` [DiGi\.Analytical\.Building\.Classes\.BuildingModel](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.classes.buildingmodel 'DiGi\.Analytical\.Building\.Classes\.BuildingModel')
+
+The [DiGi\.Analytical\.Building\.Classes\.BuildingModel](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.classes.buildingmodel 'DiGi\.Analytical\.Building\.Classes\.BuildingModel') hosting the opening, used to resolve its construction\. This value can be null\.
+
+<a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double).opening'></a>
+
+`opening` [DiGi\.Analytical\.Building\.Interfaces\.IOpening](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.interfaces.iopening 'DiGi\.Analytical\.Building\.Interfaces\.IOpening')
+
+The opening to be converted\. This value can be null\.
+
+<a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double).reference'></a>
+
+`reference` [DiGi\.Core\.Interfaces\.IReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.ireference 'DiGi\.Core\.Interfaces\.IReference')
+
+The optional [DiGi\.Core\.Interfaces\.IReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.ireference 'DiGi\.Core\.Interfaces\.IReference') \(typically the hosting component's\) to extend with the opening's unique reference; its last step becomes the node name \(see [Name\(this IReference\)](DiGi.GLTF.Analytical.md#DiGi.GLTF.Analytical.Query.Name(thisDiGi.Core.Interfaces.IReference) 'DiGi\.GLTF\.Analytical\.Query\.Name\(this DiGi\.Core\.Interfaces\.IReference\)')\)\.
+
+<a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNode(DiGi.Analytical.Building.Classes.BuildingModel,DiGi.Analytical.Building.Interfaces.IOpening,DiGi.Core.Interfaces.IReference,double).tolerance'></a>
+
+`tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The distance tolerance used during triangulation\.
+
+#### Returns
+[DiGi\.GLTF\.Classes\.GLTFNode](https://learn.microsoft.com/en-us/dotnet/api/digi.gltf.classes.gltfnode 'DiGi\.GLTF\.Classes\.GLTFNode')  
+A single [DiGi\.GLTF\.Classes\.GLTFNode](https://learn.microsoft.com/en-us/dotnet/api/digi.gltf.classes.gltfnode 'DiGi\.GLTF\.Classes\.GLTFNode') representing the opening, or null when the opening has no construction or no placed surface\.
+
 <a name='DiGi.GLTF.Analytical.Convert.ToGLTF_GLTFNodes(thisDiGi.Analytical.Building.Classes.BuildingModel,DiGi.Core.Interfaces.IReference,double,DiGi.Analytical.Building.Enums.BuildingModelDetailLevel)'></a>
 
 ## Convert\.ToGLTF\_GLTFNodes\(this BuildingModel, IReference, double, BuildingModelDetailLevel\) Method
 
-Converts all components of the specified [DiGi\.Analytical\.Building\.Classes\.BuildingModel](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.classes.buildingmodel 'DiGi\.Analytical\.Building\.Classes\.BuildingModel') \(walls, roofs, floors and other components with surface geometry\) into [DiGi\.GLTF\.Classes\.GLTFNode](https://learn.microsoft.com/en-us/dotnet/api/digi.gltf.classes.gltfnode 'DiGi\.GLTF\.Classes\.GLTFNode') instances\.
+Converts all components of the specified [DiGi\.Analytical\.Building\.Classes\.BuildingModel](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.classes.buildingmodel 'DiGi\.Analytical\.Building\.Classes\.BuildingModel') \(walls, roofs, floors and other components with surface geometry\), and in [DiGi\.Analytical\.Building\.Enums\.BuildingModelDetailLevel\.Component](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.enums.buildingmodeldetaillevel.component 'DiGi\.Analytical\.Building\.Enums\.BuildingModelDetailLevel\.Component') detail the windows and doors hosted on them, into [DiGi\.GLTF\.Classes\.GLTFNode](https://learn.microsoft.com/en-us/dotnet/api/digi.gltf.classes.gltfnode 'DiGi\.GLTF\.Classes\.GLTFNode') instances\.
+
+In [DiGi\.Analytical\.Building\.Enums\.BuildingModelDetailLevel\.Component](https://learn.microsoft.com/en-us/dotnet/api/digi.analytical.building.enums.buildingmodeldetaillevel.component 'DiGi\.Analytical\.Building\.Enums\.BuildingModelDetailLevel\.Component') detail, an opening hosted on a component is exported after the component's nodes: windows with opacity 0.5, doors with opacity 1; an opening without a construction or without a placed surface is skipped.
 
 ```csharp
 public static System.Collections.Generic.List<DiGi.GLTF.Classes.GLTFNode>? ToGLTF_GLTFNodes(this DiGi.Analytical.Building.Classes.BuildingModel? buildingModel, DiGi.Core.Interfaces.IReference? reference=null, double tolerance=1E-06, DiGi.Analytical.Building.Enums.BuildingModelDetailLevel buildingModelDetailLevel=DiGi.Analytical.Building.Enums.BuildingModelDetailLevel.Component);
